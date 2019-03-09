@@ -1,0 +1,3 @@
+"0","table(format(ts,""%u""), format(ts,""%H"")) %>% "
+"0","  as.data.frame.matrix %>% "
+"0","  d3heatmap(F,F,col=colorRamp(c('seagreen','lightyellow','red')))   #熱圖"

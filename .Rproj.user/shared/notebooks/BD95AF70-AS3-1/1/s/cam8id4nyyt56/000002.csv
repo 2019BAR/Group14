@@ -1,0 +1,126 @@
+"0","# é€™äº›ç¨‹å¼ç¢¼è¨­å®šç¶²é çš„æ ¼å¼ï¼Œä¸¦å®‰è£ã€è¼‰å…¥ä¸€äº›åŸºæœ¬çš„å¥—ä»¶ï¼Œè«‹å¤§å®¶ä¸è¦å»æ”¹å‹•<br>"
+"0","rm(list=ls(all=T))"
+"2","Warning message:
+"
+"2","In strsplit(code, ""\n"", fixed = TRUE) :"
+"2","
+ "
+"2"," input string 1 is invalid in this locale
+"
+"0","knitr::opts_chunk$set(comment = NA)"
+"0","knitr::opts_knit$set(global.par = TRUE)"
+"0","par(cex=0.8)"
+"0","options(scipen=20, digits=4, width=90)"
+"0","#"
+"0","if(!require(pacman)) install.packages(""pacman"")"
+"2","Loading required package: pacman
+"
+"0","pacman::p_load(dplyr, d3heatmap)"
+"2","Installing package into ¡¥C:/Users/BoSiang/Documents/R/win-library/3.5¡¦
+(as ¡¥lib¡¦ is unspecified)
+"
+"2","cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/src/contrib/PACKAGES.rds': HTTP status was '404 Not Found'"
+"2","also installing the dependencies ¡¥utf8¡¦, ¡¥fansi¡¦, ¡¥pillar¡¦, ¡¥purrr¡¦, ¡¥pkgconfig¡¦, ¡¥tibble¡¦, ¡¥tidyselect¡¦, ¡¥BH¡¦, ¡¥plogr¡¦
+
+"
+"2","cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/3.5/PACKAGES.rds': HTTP status was '404 Not Found'"
+"2","cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/3.5/PACKAGES.gz': HTTP status was '404 Not Found'"
+"2","cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/3.5/PACKAGES': HTTP status was '404 Not Found'"
+"2","unable to access index for repository http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/3.5:
+  cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/3.5/PACKAGES'"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/utf8_1.1.4.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 214649 bytes (209 KB)
+"
+"2","downloaded 209 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/fansi_0.4.0.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 220284 bytes (215 KB)
+"
+"2","downloaded 215 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/pillar_1.3.1.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 155073 bytes (151 KB)
+"
+"2","downloaded 151 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/purrr_0.3.1.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 416927 bytes (407 KB)
+"
+"2","downloaded 407 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/pkgconfig_2.0.2.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 22208 bytes (21 KB)
+"
+"2","downloaded 21 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/tibble_2.0.1.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 739169 bytes (721 KB)
+"
+"2","downloaded 721 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/tidyselect_0.2.5.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 624937 bytes (610 KB)
+"
+"2","downloaded 610 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/BH_1.69.0-1.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 19008161 bytes (18.1 MB)
+"
+"2","downloaded 18.1 MB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/plogr_0.2.0.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 18732 bytes (18 KB)
+"
+"2","downloaded 18 KB
+
+"
+"2","trying URL 'https://cran.rstudio.com/bin/windows/contrib/3.5/dplyr_0.8.0.1.zip'
+"
+"2","Content type 'application/zip'"
+"2"," length 3240833 bytes (3.1 MB)
+"
+"2","downloaded 3.1 MB
+
+"
+"1","package â€˜utf8â€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜fansiâ€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜pillarâ€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜purrrâ€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜pkgconfigâ€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜tibbleâ€™ successfully unpacked and MD5 sums checked
+"
+"1","package â€˜tidyselectâ€™ successfully unpacked and MD5 sums checked
+"
+"2","
+"

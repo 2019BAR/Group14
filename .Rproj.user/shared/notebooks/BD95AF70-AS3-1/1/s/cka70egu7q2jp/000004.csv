@@ -1,0 +1,7 @@
+"0","D = read.csv(""data/mvtWeek1.csv"", stringsAsFactors=F)"
+"0","nrow(D)"
+"1","[1]"
+"1"," 191641"
+"1","
+"
+"0","#"

@@ -1,0 +1,2 @@
+"0","par(cex=0.7)"
+"0","hist(ts,""year"",las=2,freq=T,xlab="""")"

@@ -1,0 +1,16 @@
+"0","# 這些程式碼設定網頁的格式，並安裝、載入一些基本的套件，請大家不要去改動<br>"
+"0","rm(list=ls(all=T))"
+"2","Warning message:
+"
+"2","In strsplit(code, ""\n"", fixed = TRUE) :"
+"2","
+ "
+"2"," input string 1 is invalid in this locale
+"
+"0","knitr::opts_chunk$set(comment = NA)"
+"0","knitr::opts_knit$set(global.par = TRUE)"
+"0","par(cex=0.8)"
+"0","options(scipen=20, digits=4, width=90)"
+"0","#"
+"0","if(!require(pacman)) install.packages(""pacman"")"
+"0","pacman::p_load(dplyr)"
