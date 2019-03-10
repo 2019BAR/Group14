@@ -45,55 +45,47 @@ pacman::p_load(dplyr)
 
 ###  Section-1 Loading and Summarizing the Dataset
 
-__§ 1.1__ How many interviewees are in the dataset? answer: 131302
+__§ 1.1__ How many interviewees are in the dataset? 
+Ans: 131302
 ```{r}
-#
 #載入CPSdata資料
 CPSData <- read.csv('data/CPSData.csv')
 #透過str function 得知大略的資料狀態並得知共有131302個interviewees
 str(CPSData)
-
-#
 ```
 
-__§ 1.2__ Among the interviewees with a value reported for the Industry variable, what is the most common industry of employment? Please enter the name exactly how you see it. answer:Educational and health services
+__§ 1.2__ Among the interviewees with a value reported for the Industry variable, what is the most common industry of employment? Please enter the name exactly how you see it. Ans:Educational and health services
 ```{r}
-#
 #透過table可以看到Industry產生次數分配表得知各個Industry的總數，再透過sort清楚看出哪個最多人
 sort(table(CPSData$Industry),decreasing = TRUE)
-#
 ```
 
-__§ 1.3__ Which state has the fewest interviewees? answer:New Mexico
+__§ 1.3__ Which state has the fewest interviewees? 
+
+Ans:New Mexico
 ```{r}
-#
 #透過table可以看到Industry產生次數分配表得知各個State的總數，再透過sort清楚看出哪個最少人
 sort(table(CPSData$State))
-#
 ```
 
-Which state has the largest number of interviewees? answer: California
+Which state has the largest number of interviewees? 
+
+Ans: California
 ```{r}
-#
 #透過table可以看到Industry產生次數分配表得知各個State的總數，再透過sort清楚看出哪個最多人
 sort(table(CPSData$State),decreasing = TRUE)
-#
 ```
 
-__§ 1.4__ What proportion of interviewees are citizens of the United States? answer: 0.9421943
+__§ 1.4__ What proportion of interviewees are citizens of the United States? 
+
+Ans: 0.94219
 ```{r}
-#
-#step 1:透過table得知有7590為Non-Citizen
-table(CPSData$Citizenship)
-#step 2:透過nrow知道總數為131302
-nrow(CPSData)
-#step 3:再以100%減去Non-Citizen，則為citizens of the United States的比例
-1-7590/131302
-#
+table(CPSData$Citizenship == "Non-Citizen") %>% prop.table  
+#找出citizens相等於找Non-Citizen 為FALSE的比率=0.94219
 ```
 
 __§ 1.5__ For which races are there at least 250 interviewees in the CPS dataset of Hispanic ethnicity? (Select all that apply.)  
-answer: American Indian, Black, Multiracial and White
+Ans: American Indian, Black, Multiracial and White
 + American Indian
 + Asian
 + cBlack
@@ -102,11 +94,11 @@ answer: American Indian, Black, Multiracial and White
 + White
 
 ```{r}
-#New York-Northern
-#透過table可以看到Race以及Hispanic的交叉表得知各個Race中為Hispanic的總數看出哪個大於250
+#透過table可以看到Race以及Hispanic的交叉表得知各個Race中為Hispanic的總數看出American Indian,Black,Multiracial,White大於250
 table(CPSData$Race, CPSData$Hispanic)
-#
 ```
+
+Ans:New York-Northern
 
 <br><br> 
 
@@ -132,14 +124,15 @@ __§ 2.1__ Which variables have at least one interviewee with a missing (NA) val
 + Industry
 
 ```{r}
-#
-#透過apply逐列，再透過is.na function 得知missing (NA) value 最後以any判斷出各列是否有出現na值
-sort(apply(is.na(CPSData), 2, any))
-#
+#判斷出各列出現na值的數量
+colSums(is.na(CPSData))
 ```
 
+Ans: MetroAreaCode, Married, Education, EmploymentStatus, Industry
+
 __§ 2.2__  Which is the most accurate:
-answer : The Married variable being missing is related to the Age value for the interviewee.this statemet is the most accurate.
+
+Ans : The Married variable being missing is related to the Age value for the interviewee.this statemet is the most accurate.
 
 + The Married variable being missing is related to the Region value for the interviewee.
 + The Married variable being missing is related to the Sex value for the interviewee.
@@ -148,61 +141,65 @@ answer : The Married variable being missing is related to the Age value for the 
 + The Married variable being missing is not related to the Region, Sex, Age, or Citizenship value for the interviewee.
 
 ```{r}
-#
 #透過table得知Region, Sex, Age, Citizenship以及Married的na值對照得知Age最有相關
 table(CPSData$Region, is.na(CPSData$Married))
 table(CPSData$Sex, is.na(CPSData$Married))
 table(CPSData$Age, is.na(CPSData$Married))
 table(CPSData$Citizenship, is.na(CPSData$Married))
-#
 ```
 
 
-__§ 2.3__ How many states had all interviewees living in a non-metropolitan area (aka they have a missing MetroAreaCode value)? For this question, treat the District of Columbia as a state (even though it is not technically a state). answer: 2
+__§ 2.3__ How many states had all interviewees living in a non-metropolitan area (aka they have a missing MetroAreaCode value)? For this question, treat the District of Columbia as a state (even though it is not technically a state). 
+
+Ans: 2
 ```{r}
-#
-#透過is.na得知是否為 non-metropolitan area的interviewee，再#透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，flase為0只有2個states
+#透過is.na得知是否為 non-metropolitan area的interviewee，再#透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，false為0只有2個states
 table(CPSData$State,is.na(CPSData$MetroAreaCode))
-#
 ```
 
-How many states had all interviewees living in a metropolitan area? Again, treat the District of Columbia as a state. answer: 3
+How many states had all interviewees living in a metropolitan area? Again, treat the District of Columbia as a state. 
+
+Ans: 3
 ```{r}
-#
 #step 1: 透過is.na得知是否為 non-metropolitan area的interviewee
-#step 2: 再透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，true為1只有3個states
+#step 2: 再透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，true為0只有3個states
 table(CPSData$State,is.na(CPSData$MetroAreaCode))
-#
 ```
 
-__§ 2.4__ Which region of the United States has the largest proportion of interviewees living in a non-metropolitan area? answer: Midwest
+__§ 2.4__ Which region of the United States has the largest proportion of interviewees living in a non-metropolitan area? 
+
+Ans: Midwest
 ```{r}
-#
 #step 1: 透過is.na得知是否為 non-metropolitan area的interviewee
 #step 2: 再透過tapply看出各個Region的 non-metropolitan area的interviewee的平均(mean)
 #step 3: 透過sort讓資料按照順序排序看出Midwest為最大比率
 sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$Region, mean),decreasing = TRUE)
-#
+
 ```
 
-__§ 2.5__ Which state has a proportion of interviewees living in a non-metropolitan area closest to 30%? answer:Wisconsin
+__§ 2.5__ Which state has a proportion of interviewees living in a non-metropolitan area closest to 30%? 
+
+Ans:Wisconsin
 ```{r}
-#
 #step 1: 透過is.na得知是否為 non-metropolitan area的interviewee
 #step 2: 再透過tapply看出各個State的 non-metropolitan area的interviewee的平均(mean)
 #step 3: 透過sort讓資料按照順序排序看出Wisconsin為最接近30%的State
-sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))
-#
+#sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))
+
+abs(0.3 - tapply(is.na(CPSData$MetroAreaCode), CPSData$State, mean)) %>% 
+  sort %>% head 
+#列出跟30%最接近的State
 ```
 
-Which state has the largest proportion of non-metropolitan interviewees, ignoring states where all interviewees were non-metropolitan? answer:Montana
+Which state has the largest proportion of non-metropolitan interviewees, ignoring states where all interviewees were non-metropolitan? 
+
+Ans:Montana
 ```{r}
-#
 #step 1: 透過is.na得知是否為 non-metropolitan area的interviewee
 #step 2: 再透過tapply看出各個State的 non-metropolitan area的interviewee的平均(mean)
 #step 3: 透過sort讓資料按照順序排序看出除了Alaska,Wyoming皆為non-metropolitan,最大的為Montana 
-sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))
-#
+sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))%>%tail
+
 ```
 
 <br><br> 
@@ -211,80 +208,79 @@ sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))
 
 ###  Section-3 Integrating Metropolitan Area Data
 
-__§ 3.1__ How many observations (codes for metropolitan areas) are there in MetroAreaMap? answer:271
+__§ 3.1__ How many observations (codes for metropolitan areas) are there in MetroAreaMap? 
+
+Ans:271
 ```{r}
-#
 #載入MetroAreaCodes資料
 MetroAreaMap <- read.csv('data/MetroAreaCodes.csv')
 #透過str function 得知大略的資料狀態並得知共有271個observations
 str(MetroAreaMap)
-MetroAreaMap
-#
 ```
 
-How many observations (codes for countries) are there in CountryMap? answer:149
+How many observations (codes for countries) are there in CountryMap? 
+
+Ans:149
 ```{r}
-#
 #載入CountryCodes資料
 CountryMap <- read.csv('data/CountryCodes.csv')
 #透過str function 得知大略的資料狀態並得知共有149個observations
 str(CountryMap)
-CountryMap
-#
 ```
 
-__§ 3.2__ What is the name of the variable that was added to the data frame by the merge() operation?answer:MetroArea
+__§ 3.2__ What is the name of the variable that was added to the data frame by the merge() operation?
+
+Ans:MetroArea
 ```{r}
-#
 #step 1:透過merge將CPSData與MetroAreaMap合併,再透過MetroAreaCode與Code欄位比對,並且保留全部x(MetroAreaCode)
 #step 2:透過str比對出CPSData有14個variables及CPS_area有15個variables得知增加一個variable,經對照後看出為MetroArea
 CPS_area = merge(CPSData, MetroAreaMap, by.x="MetroAreaCode", by.y="Code", all.x=TRUE)
 str(CPSData)
 str(CPS_area)
-#
 ```
 
-How many interviewees have a missing value for the new metropolitan area variable? answer:34238
+How many interviewees have a missing value for the new metropolitan area variable? 
+
+Ans:34238
 ```{r}
-#
 #透過summary可以看到MetroArea有34238 missing values
-summary(CPS_area)
-#
+#summary(CPS_area)
+sum(is.na(CPS_area$MetroArea))
 ```
 
-__§ 3.3__ Which of the following metropolitan areas has the largest number of interviewees?answer:New York-Northern New Jersey-Long Island, NY-NJ-PA
+__§ 3.3__ Which of the following metropolitan areas has the largest number of interviewees?
+
+Ans:New York-Northern New Jersey-Long Island, NY-NJ-PA
 ```{r}
-#
 #透過table可以看到MetroArea產生次數分配表得知各個IMetroArea的interviewees總數，再透過sort清楚看出哪個最多人
-sort(table(CPS_area$MetroArea),decreasing = TRUE)
-#
+sort(table(CPS_area$MetroArea),decreasing = TRUE) %>% head
 ```
 
-__§ 3.4__ Which metropolitan area has the highest proportion of interviewees of Hispanic ethnicity? answer:Laredo, TX
+__§ 3.4__ Which metropolitan area has the highest proportion of interviewees of Hispanic ethnicity? 
+
+Ans:Laredo, TX
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 Hispanic的interviewee的平均(mean)
 #step 2: 透過sort讓資料按照順序排序看出Laredo, TX為最大比率
-sort(tapply(CPS_area$Hispanic,CPS_area$MetroArea,mean),decreasing = TRUE)
-#
+sort(tapply(CPS_area$Hispanic,CPS_area$MetroArea,mean),decreasing = TRUE) %>% head
 ```
 
-__§ 3.5__ Determine the number of metropolitan areas in the United States from which at least 20% of interviewees are Asian.answer4
+__§ 3.5__ Determine the number of metropolitan areas in the United States from which at least 20% of interviewees are Asian.
+
+Ans:4
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 Asian的interviewee的平均(mean)
 #step 2: 透過table次數分配表找出大於0.2的metropolitan areas共有四個
 table(tapply(CPS_area$Race == "Asian",CPS_area$MetroArea,mean)>0.2)
-#
 ```
 
-__§ 3.6__  Passing na.rm=TRUE to the tapply function, determine which metropolitan area has the smallest proportion of interviewees who have received no high school diploma. answer: Iowa City, IA
+__§ 3.6__  Passing na.rm=TRUE to the tapply function, determine which metropolitan area has the smallest proportion of interviewees who have received no high school diploma. 
+
+Ans: Iowa City, IA
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 Education中 No high school diploma的比率,並且移除NA值
 #step 2: 再透過sort排序找出最小比率的metropolitan area為Iowa City, IA
-sort(tapply(CPS_area$Education == "No high school diploma", CPS_area$MetroArea, mean,na.rm=TRUE))
-#
+sort(tapply(CPS_area$Education == "No high school diploma", CPS_area$MetroArea, mean,na.rm=TRUE)) %>% head
 ```
 
 
@@ -294,71 +290,72 @@ sort(tapply(CPS_area$Education == "No high school diploma", CPS_area$MetroArea, 
 
 ###  Section-4 Integrating Country of Birth Data
 
-__§ 4.1__ What is the name of the variable added to the CPS data frame by this merge operation? answer:Country
+__§ 4.1__ What is the name of the variable added to the CPS data frame by this merge operation? 
+
+Ans:Country
 ```{r}
-#
 #step 1:透過merge將CPSData與CountryMap合併,再透過CountryOfBirthCode與Code欄位比對,並且保留全部x(CountryOfBirthCode)
 #step 2:透過str比對出CPSData有14個variables及CPS_country有15個variables得知增加一個variable,經對照後看出為Country
 CPS_country = merge(CPSData, CountryMap, by.x="CountryOfBirthCode", by.y="Code", all.x=TRUE)
 str(CPSData)
 str(CPS_country)
-#
 ```
 
-How many interviewees have a missing value for the new metropolitan area variable? answer:176
+How many interviewees have a missing value for the new metropolitan area variable? 
+
+Ans:176
 ```{r}
-#
+
 #透過is.na得知Country的值是否為na
 #再透過table得知是na值的總數
 table(is.na(CPS_country$Country))
-#
 ```
 
-__§ 4.2__ Among all interviewees born outside of North America, which country was the most common place of birth? answer:Philippines
+__§ 4.2__ Among all interviewees born outside of North America, which country was the most common place of birth? 
+
+Ans:Philippines
 ```{r}
-#
 #透過table得知country的次數分配 再透過sort看出其最常見的出生地為Philippines
-sort(table(CPS_country$Country),decreasing = TRUE)
-#
+sort(table(CPS_country$Country),decreasing = TRUE)%>%head
 ```
 
-__§ 4.3__ What proportion of the interviewees from the "New York-Northern New Jersey-Long Island, NY-NJ-PA" metropolitan area have a country of birth that is not the United States? answer:0.309
+__§ 4.3__ What proportion of the interviewees from the "New York-Northern New Jersey-Long Island, NY-NJ-PA" metropolitan area have a country of birth that is not the United States? 
+
+Ans:0.309
 ```{r}
-#
 #step 1:將所有的資料合併透過CPS_cuntry 加上MetroAreaMap
 #step 2:再透過table計算Country不為United States以及MetroArea為New York-Northern New Jersey-Long Island, NY-NJ-PA
 #step 3:透過table看出共有1668人為題目所需再除以1668+3736
 CPS_all = merge(CPS_country, MetroAreaMap, by.x="MetroAreaCode", by.y="Code", all.x=TRUE)
 table(CPS_all$Country!='United States',CPS_all$MetroArea=='New York-Northern New Jersey-Long Island, NY-NJ-PA')
 1668 / (3736+1668)
-#
 ```
 
-__§ 4.4__ Which metropolitan area has the largest number (note -- not proportion) of interviewees with a country of birth in India?  answer:New York-Northern New Jersey-Long Island, NY-NJ-PA
+__§ 4.4__ Which metropolitan area has the largest number (note -- not proportion) of interviewees with a country of birth in India?  
+
+Ans:New York-Northern New Jersey-Long Island, NY-NJ-PA
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值
 #step 2: 再透過sort排序找出最大的metropolitan area為New York-Northern New Jersey-Long Island, NY-NJ-PA
-sort(tapply(CPS_all$Country == "India", CPS_all$MetroArea, sum, na.rm=TRUE))
-#
+sort(tapply(CPS_all$Country == "India", CPS_all$MetroArea, sum, na.rm=TRUE)) %>%tail
 ```
 
-In Brazil? answer: Boston-Cambridge-Quincy, MA-NH
+In Brazil? 
+
+Ans: Boston-Cambridge-Quincy, MA-NH
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值
 #step 2: 再透過sort排序找出最大的metropolitan area為Boston-Cambridge-Quincy, MA-NH
-sort(tapply(CPS_all$Country == "Brazil", CPS_all$MetroArea, sum, na.rm=TRUE))
-#
+sort(tapply(CPS_all$Country == "Brazil", CPS_all$MetroArea, sum, na.rm=TRUE)) %>%tail
 ```
 
-In Somalia? answer: Minneapolis-St Paul-Bloomington, MN-WI
+In Somalia? 
+
+Ans: Minneapolis-St Paul-Bloomington, MN-WI
 ```{r}
-#
 #step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值
 #step 2: 再透過sort排序找出最大的metropolitan area為Minneapolis-St Paul-Bloomington, MN-WI
-sort(tapply(CPS_all$Country == "Somalia", CPS_all$MetroArea, sum, na.rm=TRUE))
-#
+sort(tapply(CPS_all$Country == "Somalia", CPS_all$MetroArea, sum, na.rm=TRUE))%>%tail
 ```
 
 <br><br><br>

@@ -9,7 +9,7 @@
 <meta name="generator" content="pandoc" />
 
 
-<meta name="author" content="第 0 組" />
+<meta name="author" content="第 14 組" />
 
 
 <title>AS3-3: 美國的人口統計和就業資料</title>
@@ -118,6 +118,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -146,8 +149,8 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">AS3-3: 美國的人口統計和就業資料</h1>
-<h4 class="author"><em>第 0 組</em></h4>
-<h4 class="date"><em>2019-03-05 22:01:34</em></h4>
+<h4 class="author"><em>第 14 組</em></h4>
+<h4 class="date"><em>2019-03-10 23:28:35</em></h4>
 
 </div>
 
@@ -174,32 +177,126 @@ $(document).ready(function () {
 <p><br><br></p>
 <div id="section-1-loading-and-summarizing-the-dataset" class="section level3">
 <h3>Section-1 Loading and Summarizing the Dataset</h3>
-<p><strong>§ 1.1</strong> How many interviewees are in the dataset?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
-<p><strong>§ 1.2</strong> Among the interviewees with a value reported for the Industry variable, what is the most common industry of employment? Please enter the name exactly how you see it.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p><strong>§ 1.1</strong> How many interviewees are in the dataset? Ans: 131302</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#載入CPSdata資料</span>
+CPSData &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">'data/CPSData.csv'</span>)
+<span class="co">#透過str function 得知大略的資料狀態並得知共有131302個interviewees</span>
+<span class="kw">str</span>(CPSData)</code></pre></div>
+<pre><code>'data.frame':   131302 obs. of  14 variables:
+ $ PeopleInHousehold : int  1 3 3 3 3 3 3 2 2 2 ...
+ $ Region            : Factor w/ 4 levels &quot;Midwest&quot;,&quot;Northeast&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ State             : Factor w/ 51 levels &quot;Alabama&quot;,&quot;Alaska&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ MetroAreaCode     : int  26620 13820 13820 13820 26620 26620 26620 33660 33660 26620 ...
+ $ Age               : int  85 21 37 18 52 24 26 71 43 52 ...
+ $ Married           : Factor w/ 5 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 5 3 3 3 5 3 3 1 1 3 ...
+ $ Sex               : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 2 1 2 1 2 2 1 2 2 ...
+ $ Education         : Factor w/ 8 levels &quot;Associate degree&quot;,..: 1 4 4 6 1 2 4 4 4 2 ...
+ $ Race              : Factor w/ 6 levels &quot;American Indian&quot;,..: 6 3 3 3 6 6 6 6 6 6 ...
+ $ Hispanic          : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ CountryOfBirthCode: int  57 57 57 57 57 57 57 57 57 57 ...
+ $ Citizenship       : Factor w/ 3 levels &quot;Citizen, Native&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: 4 5 1 3 2 2 2 2 3 2 ...
+ $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA 11 NA NA 11 4 14 4 NA 12 ...</code></pre>
+<p><strong>§ 1.2</strong> Among the interviewees with a value reported for the Industry variable, what is the most common industry of employment? Please enter the name exactly how you see it. Ans:Educational and health services</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table可以看到Industry產生次數分配表得知各個Industry的總數，再透過sort清楚看出哪個最多人</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPSData<span class="op">$</span>Industry),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>
+            Educational and health services                                       Trade 
+                                      15017                                        8933 
+         Professional and business services                               Manufacturing 
+                                       7519                                        6791 
+                    Leisure and hospitality                                Construction 
+                                       6364                                        4387 
+                                  Financial                Transportation and utilities 
+                                       4347                                        3260 
+                             Other services                       Public administration 
+                                       3224                                        3186 
+                                Information Agriculture, forestry, fishing, and hunting 
+                                       1328                                        1307 
+                                     Mining                                Armed forces 
+                                        550                                          29 </code></pre>
 <p><strong>§ 1.3</strong> Which state has the fewest interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:New Mexico</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table可以看到Industry產生次數分配表得知各個State的總數，再透過sort清楚看出哪個最少人</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPSData<span class="op">$</span>State))</code></pre></div>
+<pre><code>
+          New Mexico              Montana          Mississippi              Alabama 
+                1102                 1214                 1230                 1376 
+       West Virginia             Arkansas            Louisiana                Idaho 
+                1409                 1421                 1450                 1518 
+            Oklahoma              Arizona               Alaska              Wyoming 
+                1523                 1528                 1590                 1624 
+        North Dakota       South Carolina            Tennessee District of Columbia 
+                1645                 1658                 1784                 1791 
+            Kentucky                 Utah               Nevada              Vermont 
+                1841                 1842                 1856                 1890 
+              Kansas               Oregon             Nebraska        Massachusetts 
+                1935                 1943                 1949                 1987 
+        South Dakota              Indiana               Hawaii             Missouri 
+                2000                 2004                 2099                 2145 
+        Rhode Island             Delaware                Maine           Washington 
+                2209                 2214                 2263                 2366 
+                Iowa           New Jersey       North Carolina        New Hampshire 
+                2528                 2567                 2619                 2662 
+           Wisconsin              Georgia          Connecticut             Colorado 
+                2686                 2807                 2836                 2925 
+            Virginia             Michigan            Minnesota             Maryland 
+                2953                 3063                 3139                 3200 
+                Ohio             Illinois         Pennsylvania              Florida 
+                3678                 3912                 3930                 5149 
+            New York                Texas           California 
+                5595                 7077                11570 </code></pre>
 <p>Which state has the largest number of interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: California</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table可以看到Industry產生次數分配表得知各個State的總數，再透過sort清楚看出哪個最多人</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPSData<span class="op">$</span>State),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>
+          California                Texas             New York              Florida 
+               11570                 7077                 5595                 5149 
+        Pennsylvania             Illinois                 Ohio             Maryland 
+                3930                 3912                 3678                 3200 
+           Minnesota             Michigan             Virginia             Colorado 
+                3139                 3063                 2953                 2925 
+         Connecticut              Georgia            Wisconsin        New Hampshire 
+                2836                 2807                 2686                 2662 
+      North Carolina           New Jersey                 Iowa           Washington 
+                2619                 2567                 2528                 2366 
+               Maine             Delaware         Rhode Island             Missouri 
+                2263                 2214                 2209                 2145 
+              Hawaii              Indiana         South Dakota        Massachusetts 
+                2099                 2004                 2000                 1987 
+            Nebraska               Oregon               Kansas              Vermont 
+                1949                 1943                 1935                 1890 
+              Nevada                 Utah             Kentucky District of Columbia 
+                1856                 1842                 1841                 1791 
+           Tennessee       South Carolina         North Dakota              Wyoming 
+                1784                 1658                 1645                 1624 
+              Alaska              Arizona             Oklahoma                Idaho 
+                1590                 1528                 1523                 1518 
+           Louisiana             Arkansas        West Virginia              Alabama 
+                1450                 1421                 1409                 1376 
+         Mississippi              Montana           New Mexico 
+                1230                 1214                 1102 </code></pre>
 <p><strong>§ 1.4</strong> What proportion of interviewees are citizens of the United States?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
-<p><strong>§ 1.5</strong> For which races are there at least 250 interviewees in the CPS dataset of Hispanic ethnicity? (Select all that apply.)</p>
-<ul>
-<li>American Indian</li>
-<li>Asian</li>
-<li>cBlack</li>
-<li>Multiracial</li>
-<li>Pacific Islander</li>
-<li>White</li>
-</ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: 0.94219</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPSData<span class="op">$</span>Citizenship <span class="op">==</span><span class="st"> &quot;Non-Citizen&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>prop.table  </code></pre></div>
+<pre><code>
+  FALSE    TRUE 
+0.94219 0.05781 </code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#找出citizens相等於找Non-Citizen 為FALSE的比率=0.94219</span></code></pre></div>
+<p><strong>§ 1.5</strong> For which races are there at least 250 interviewees in the CPS dataset of Hispanic ethnicity? (Select all that apply.)<br />
+Ans: American Indian, Black, Multiracial and White + American Indian + Asian + cBlack + Multiracial + Pacific Islander + White</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table可以看到Race以及Hispanic的交叉表得知各個Race中為Hispanic的總數看出American Indian,Black,Multiracial,White大於250</span>
+<span class="kw">table</span>(CPSData<span class="op">$</span>Race, CPSData<span class="op">$</span>Hispanic)</code></pre></div>
+<pre><code>                  
+                       0     1
+  American Indian   1129   304
+  Asian             6407   113
+  Black            13292   621
+  Multiracial       2449   448
+  Pacific Islander   541    77
+  White            89190 16731</code></pre>
+<p>Ans:New York-Northern</p>
 <p><br><br></p>
 <hr />
 </div>
@@ -222,9 +319,19 @@ $(document).ready(function () {
 <li>EmploymentStatus</li>
 <li>Industry</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#判斷出各列出現na值的數量</span>
+<span class="kw">colSums</span>(<span class="kw">is.na</span>(CPSData))</code></pre></div>
+<pre><code> PeopleInHousehold             Region              State      MetroAreaCode 
+                 0                  0                  0              34238 
+               Age            Married                Sex          Education 
+                 0              25338                  0              25338 
+              Race           Hispanic CountryOfBirthCode        Citizenship 
+                 0                  0                  0                  0 
+  EmploymentStatus           Industry 
+             25789              65060 </code></pre>
+<p>Ans: MetroAreaCode, Married, Education, EmploymentStatus, Industry</p>
 <p><strong>§ 2.2</strong> Which is the most accurate:</p>
+<p>Ans : The Married variable being missing is related to the Age value for the interviewee.this statemet is the most accurate.</p>
 <ul>
 <li>The Married variable being missing is related to the Region value for the interviewee.</li>
 <li>The Married variable being missing is related to the Sex value for the interviewee.</li>
@@ -232,78 +339,479 @@ $(document).ready(function () {
 <li>The Married variable being missing is related to the Citizenship value for the interviewee.</li>
 <li>The Married variable being missing is not related to the Region, Sex, Age, or Citizenship value for the interviewee.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table得知Region, Sex, Age, Citizenship以及Married的na值對照得知Age最有相關</span>
+<span class="kw">table</span>(CPSData<span class="op">$</span>Region, <span class="kw">is.na</span>(CPSData<span class="op">$</span>Married))</code></pre></div>
+<pre><code>           
+            FALSE  TRUE
+  Midwest   24609  6075
+  Northeast 21432  4507
+  South     33535  7967
+  West      26388  6789</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPSData<span class="op">$</span>Sex, <span class="kw">is.na</span>(CPSData<span class="op">$</span>Married))</code></pre></div>
+<pre><code>        
+         FALSE  TRUE
+  Female 55264 12217
+  Male   50700 13121</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPSData<span class="op">$</span>Age, <span class="kw">is.na</span>(CPSData<span class="op">$</span>Married))</code></pre></div>
+<pre><code>    
+     FALSE TRUE
+  0      0 1283
+  1      0 1559
+  2      0 1574
+  3      0 1693
+  4      0 1695
+  5      0 1795
+  6      0 1721
+  7      0 1681
+  8      0 1729
+  9      0 1748
+  10     0 1750
+  11     0 1721
+  12     0 1797
+  13     0 1802
+  14     0 1790
+  15  1795    0
+  16  1751    0
+  17  1764    0
+  18  1596    0
+  19  1517    0
+  20  1398    0
+  21  1525    0
+  22  1536    0
+  23  1638    0
+  24  1627    0
+  25  1604    0
+  26  1643    0
+  27  1657    0
+  28  1736    0
+  29  1645    0
+  30  1854    0
+  31  1762    0
+  32  1790    0
+  33  1804    0
+  34  1653    0
+  35  1716    0
+  36  1663    0
+  37  1531    0
+  38  1530    0
+  39  1542    0
+  40  1571    0
+  41  1673    0
+  42  1711    0
+  43  1819    0
+  44  1764    0
+  45  1749    0
+  46  1665    0
+  47  1647    0
+  48  1791    0
+  49  1989    0
+  50  1966    0
+  51  1931    0
+  52  1935    0
+  53  1994    0
+  54  1912    0
+  55  1895    0
+  56  1935    0
+  57  1827    0
+  58  1874    0
+  59  1758    0
+  60  1746    0
+  61  1735    0
+  62  1595    0
+  63  1596    0
+  64  1519    0
+  65  1569    0
+  66  1577    0
+  67  1227    0
+  68  1130    0
+  69  1062    0
+  70  1195    0
+  71  1031    0
+  72   941    0
+  73   896    0
+  74   842    0
+  75   763    0
+  76   729    0
+  77   698    0
+  78   659    0
+  79   661    0
+  80  2664    0
+  85  2446    0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(CPSData<span class="op">$</span>Citizenship, <span class="kw">is.na</span>(CPSData<span class="op">$</span>Married))</code></pre></div>
+<pre><code>                      
+                       FALSE  TRUE
+  Citizen, Native      91956 24683
+  Citizen, Naturalized  6910   163
+  Non-Citizen           7098   492</code></pre>
 <p><strong>§ 2.3</strong> How many states had all interviewees living in a non-metropolitan area (aka they have a missing MetroAreaCode value)? For this question, treat the District of Columbia as a state (even though it is not technically a state).</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: 2</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過is.na得知是否為 non-metropolitan area的interviewee，再#透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，false為0只有2個states</span>
+<span class="kw">table</span>(CPSData<span class="op">$</span>State,<span class="kw">is.na</span>(CPSData<span class="op">$</span>MetroAreaCode))</code></pre></div>
+<pre><code>                      
+                       FALSE  TRUE
+  Alabama               1020   356
+  Alaska                   0  1590
+  Arizona               1327   201
+  Arkansas               724   697
+  California           11333   237
+  Colorado              2545   380
+  Connecticut           2593   243
+  Delaware              1696   518
+  District of Columbia  1791     0
+  Florida               4947   202
+  Georgia               2250   557
+  Hawaii                1576   523
+  Idaho                  761   757
+  Illinois              3473   439
+  Indiana               1420   584
+  Iowa                  1297  1231
+  Kansas                1234   701
+  Kentucky               908   933
+  Louisiana             1216   234
+  Maine                  909  1354
+  Maryland              2978   222
+  Massachusetts         1858   129
+  Michigan              2517   546
+  Minnesota             2150   989
+  Mississippi            376   854
+  Missouri              1440   705
+  Montana                199  1015
+  Nebraska               816  1133
+  Nevada                1609   247
+  New Hampshire         1148  1514
+  New Jersey            2567     0
+  New Mexico             832   270
+  New York              5144   451
+  North Carolina        1642   977
+  North Dakota           432  1213
+  Ohio                  2754   924
+  Oklahoma              1024   499
+  Oregon                1519   424
+  Pennsylvania          3245   685
+  Rhode Island          2209     0
+  South Carolina        1139   519
+  South Dakota           595  1405
+  Tennessee             1149   635
+  Texas                 6060  1017
+  Utah                  1455   387
+  Vermont                657  1233
+  Virginia              2367   586
+  Washington            1937   429
+  West Virginia          344  1065
+  Wisconsin             1882   804
+  Wyoming                  0  1624</code></pre>
 <p>How many states had all interviewees living in a metropolitan area? Again, treat the District of Columbia as a state.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: 3</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 透過is.na得知是否為 non-metropolitan area的interviewee</span>
+<span class="co">#step 2: 再透過table可以看到State以及non-metropolitan的交叉表得知各個State中為non-metropolitan的總數，true為0只有3個states</span>
+<span class="kw">table</span>(CPSData<span class="op">$</span>State,<span class="kw">is.na</span>(CPSData<span class="op">$</span>MetroAreaCode))</code></pre></div>
+<pre><code>                      
+                       FALSE  TRUE
+  Alabama               1020   356
+  Alaska                   0  1590
+  Arizona               1327   201
+  Arkansas               724   697
+  California           11333   237
+  Colorado              2545   380
+  Connecticut           2593   243
+  Delaware              1696   518
+  District of Columbia  1791     0
+  Florida               4947   202
+  Georgia               2250   557
+  Hawaii                1576   523
+  Idaho                  761   757
+  Illinois              3473   439
+  Indiana               1420   584
+  Iowa                  1297  1231
+  Kansas                1234   701
+  Kentucky               908   933
+  Louisiana             1216   234
+  Maine                  909  1354
+  Maryland              2978   222
+  Massachusetts         1858   129
+  Michigan              2517   546
+  Minnesota             2150   989
+  Mississippi            376   854
+  Missouri              1440   705
+  Montana                199  1015
+  Nebraska               816  1133
+  Nevada                1609   247
+  New Hampshire         1148  1514
+  New Jersey            2567     0
+  New Mexico             832   270
+  New York              5144   451
+  North Carolina        1642   977
+  North Dakota           432  1213
+  Ohio                  2754   924
+  Oklahoma              1024   499
+  Oregon                1519   424
+  Pennsylvania          3245   685
+  Rhode Island          2209     0
+  South Carolina        1139   519
+  South Dakota           595  1405
+  Tennessee             1149   635
+  Texas                 6060  1017
+  Utah                  1455   387
+  Vermont                657  1233
+  Virginia              2367   586
+  Washington            1937   429
+  West Virginia          344  1065
+  Wisconsin             1882   804
+  Wyoming                  0  1624</code></pre>
 <p><strong>§ 2.4</strong> Which region of the United States has the largest proportion of interviewees living in a non-metropolitan area?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: Midwest</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 透過is.na得知是否為 non-metropolitan area的interviewee</span>
+<span class="co">#step 2: 再透過tapply看出各個Region的 non-metropolitan area的interviewee的平均(mean)</span>
+<span class="co">#step 3: 透過sort讓資料按照順序排序看出Midwest為最大比率</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(<span class="kw">is.na</span>(CPSData<span class="op">$</span>MetroAreaCode),CPSData<span class="op">$</span>Region, mean),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>  Midwest      West     South Northeast 
+   0.3479    0.2437    0.2378    0.2162 </code></pre>
 <p><strong>§ 2.5</strong> Which state has a proportion of interviewees living in a non-metropolitan area closest to 30%?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:Wisconsin</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 透過is.na得知是否為 non-metropolitan area的interviewee</span>
+<span class="co">#step 2: 再透過tapply看出各個State的 non-metropolitan area的interviewee的平均(mean)</span>
+<span class="co">#step 3: 透過sort讓資料按照順序排序看出Wisconsin為最接近30%的State</span>
+<span class="co">#sort(tapply(is.na(CPSData$MetroAreaCode),CPSData$State, mean))</span>
+
+<span class="kw">abs</span>(<span class="fl">0.3</span> <span class="op">-</span><span class="st"> </span><span class="kw">tapply</span>(<span class="kw">is.na</span>(CPSData<span class="op">$</span>MetroAreaCode), CPSData<span class="op">$</span>State, mean)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>sort <span class="op">%&gt;%</span><span class="st"> </span>head </code></pre></div>
+<pre><code>     Wisconsin        Indiana South Carolina      Minnesota       Oklahoma       Missouri 
+     0.0006701      0.0085828      0.0130277      0.0150685      0.0276428      0.0286713 </code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#列出跟30%最接近的State</span></code></pre></div>
 <p>Which state has the largest proportion of non-metropolitan interviewees, ignoring states where all interviewees were non-metropolitan?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:Montana</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 透過is.na得知是否為 non-metropolitan area的interviewee</span>
+<span class="co">#step 2: 再透過tapply看出各個State的 non-metropolitan area的interviewee的平均(mean)</span>
+<span class="co">#step 3: 透過sort讓資料按照順序排序看出除了Alaska,Wyoming皆為non-metropolitan,最大的為Montana </span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(<span class="kw">is.na</span>(CPSData<span class="op">$</span>MetroAreaCode),CPSData<span class="op">$</span>State, mean))<span class="op">%&gt;%</span>tail</code></pre></div>
+<pre><code> South Dakota  North Dakota West Virginia       Montana        Alaska       Wyoming 
+       0.7025        0.7374        0.7559        0.8361        1.0000        1.0000 </code></pre>
 <p><br><br></p>
 <hr />
 </div>
 <div id="section-3-integrating-metropolitan-area-data" class="section level3">
 <h3>Section-3 Integrating Metropolitan Area Data</h3>
 <p><strong>§ 3.1</strong> How many observations (codes for metropolitan areas) are there in MetroAreaMap?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:271</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#載入MetroAreaCodes資料</span>
+MetroAreaMap &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">'data/MetroAreaCodes.csv'</span>)
+<span class="co">#透過str function 得知大略的資料狀態並得知共有271個observations</span>
+<span class="kw">str</span>(MetroAreaMap)</code></pre></div>
+<pre><code>'data.frame':   271 obs. of  2 variables:
+ $ Code     : int  460 3000 3160 3610 3720 6450 10420 10500 10580 10740 ...
+ $ MetroArea: Factor w/ 271 levels &quot;Akron, OH&quot;,&quot;Albany-Schenectady-Troy, NY&quot;,..: 12 92 97 117 122 195 1 3 2 4 ...</code></pre>
 <p>How many observations (codes for countries) are there in CountryMap?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:149</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#載入CountryCodes資料</span>
+CountryMap &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">'data/CountryCodes.csv'</span>)
+<span class="co">#透過str function 得知大略的資料狀態並得知共有149個observations</span>
+<span class="kw">str</span>(CountryMap)</code></pre></div>
+<pre><code>'data.frame':   149 obs. of  2 variables:
+ $ Code   : int  57 66 73 78 96 100 102 103 104 105 ...
+ $ Country: Factor w/ 149 levels &quot;Afghanistan&quot;,..: 139 57 105 135 97 3 11 18 24 37 ...</code></pre>
 <p><strong>§ 3.2</strong> What is the name of the variable that was added to the data frame by the merge() operation?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:MetroArea</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1:透過merge將CPSData與MetroAreaMap合併,再透過MetroAreaCode與Code欄位比對,並且保留全部x(MetroAreaCode)</span>
+<span class="co">#step 2:透過str比對出CPSData有14個variables及CPS_area有15個variables得知增加一個variable,經對照後看出為MetroArea</span>
+CPS_area =<span class="st"> </span><span class="kw">merge</span>(CPSData, MetroAreaMap, <span class="dt">by.x=</span><span class="st">&quot;MetroAreaCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
+<span class="kw">str</span>(CPSData)</code></pre></div>
+<pre><code>'data.frame':   131302 obs. of  14 variables:
+ $ PeopleInHousehold : int  1 3 3 3 3 3 3 2 2 2 ...
+ $ Region            : Factor w/ 4 levels &quot;Midwest&quot;,&quot;Northeast&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ State             : Factor w/ 51 levels &quot;Alabama&quot;,&quot;Alaska&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ MetroAreaCode     : int  26620 13820 13820 13820 26620 26620 26620 33660 33660 26620 ...
+ $ Age               : int  85 21 37 18 52 24 26 71 43 52 ...
+ $ Married           : Factor w/ 5 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 5 3 3 3 5 3 3 1 1 3 ...
+ $ Sex               : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 2 1 2 1 2 2 1 2 2 ...
+ $ Education         : Factor w/ 8 levels &quot;Associate degree&quot;,..: 1 4 4 6 1 2 4 4 4 2 ...
+ $ Race              : Factor w/ 6 levels &quot;American Indian&quot;,..: 6 3 3 3 6 6 6 6 6 6 ...
+ $ Hispanic          : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ CountryOfBirthCode: int  57 57 57 57 57 57 57 57 57 57 ...
+ $ Citizenship       : Factor w/ 3 levels &quot;Citizen, Native&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: 4 5 1 3 2 2 2 2 3 2 ...
+ $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA 11 NA NA 11 4 14 4 NA 12 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(CPS_area)</code></pre></div>
+<pre><code>'data.frame':   131302 obs. of  15 variables:
+ $ MetroAreaCode     : int  10420 10420 10420 10420 10420 10420 10420 10420 10420 10420 ...
+ $ PeopleInHousehold : int  4 4 2 4 1 3 4 4 2 3 ...
+ $ Region            : Factor w/ 4 levels &quot;Midwest&quot;,&quot;Northeast&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ State             : Factor w/ 51 levels &quot;Alabama&quot;,&quot;Alaska&quot;,..: 36 36 36 36 36 36 36 36 36 36 ...
+ $ Age               : int  2 9 73 40 63 19 30 6 60 32 ...
+ $ Married           : Factor w/ 5 levels &quot;Divorced&quot;,&quot;Married&quot;,..: NA NA 2 2 3 3 2 NA 2 2 ...
+ $ Sex               : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 2 2 1 1 2 1 1 1 1 2 ...
+ $ Education         : Factor w/ 8 levels &quot;Associate degree&quot;,..: NA NA 8 4 6 4 2 NA 4 4 ...
+ $ Race              : Factor w/ 6 levels &quot;American Indian&quot;,..: 6 6 6 6 6 6 2 6 6 6 ...
+ $ Hispanic          : int  0 0 0 0 0 0 0 1 0 0 ...
+ $ CountryOfBirthCode: int  57 57 57 362 57 57 203 57 57 57 ...
+ $ Citizenship       : Factor w/ 3 levels &quot;Citizen, Native&quot;,..: 1 1 1 2 1 1 3 1 1 1 ...
+ $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: NA NA 4 3 1 2 3 NA 2 2 ...
+ $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA NA NA NA NA 7 NA NA 4 13 ...
+ $ MetroArea         : Factor w/ 271 levels &quot;Akron, OH&quot;,&quot;Albany-Schenectady-Troy, NY&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 <p>How many interviewees have a missing value for the new metropolitan area variable?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:34238</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過summary可以看到MetroArea有34238 missing values</span>
+<span class="co">#summary(CPS_area)</span>
+<span class="kw">sum</span>(<span class="kw">is.na</span>(CPS_area<span class="op">$</span>MetroArea))</code></pre></div>
+<pre><code>[1] 34238</code></pre>
 <p><strong>§ 3.3</strong> Which of the following metropolitan areas has the largest number of interviewees?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:New York-Northern New Jersey-Long Island, NY-NJ-PA</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table可以看到MetroArea產生次數分配表得知各個IMetroArea的interviewees總數，再透過sort清楚看出哪個最多人</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPS_area<span class="op">$</span>MetroArea),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>head</code></pre></div>
+<pre><code>
+New York-Northern New Jersey-Long Island, NY-NJ-PA 
+                                              5409 
+      Washington-Arlington-Alexandria, DC-VA-MD-WV 
+                                              4177 
+              Los Angeles-Long Beach-Santa Ana, CA 
+                                              4102 
+          Philadelphia-Camden-Wilmington, PA-NJ-DE 
+                                              2855 
+               Chicago-Naperville-Joliet, IN-IN-WI 
+                                              2772 
+              Providence-Fall River-Warwick, MA-RI 
+                                              2284 </code></pre>
 <p><strong>§ 3.4</strong> Which metropolitan area has the highest proportion of interviewees of Hispanic ethnicity?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:Laredo, TX</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 Hispanic的interviewee的平均(mean)</span>
+<span class="co">#step 2: 透過sort讓資料按照順序排序看出Laredo, TX為最大比率</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS_area<span class="op">$</span>Hispanic,CPS_area<span class="op">$</span>MetroArea,mean),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span><span class="st"> </span>head</code></pre></div>
+<pre><code>                Laredo, TX McAllen-Edinburg-Pharr, TX  Brownsville-Harlingen, TX 
+                    0.9663                     0.9487                     0.7975 
+               El Paso, TX              El Centro, CA            San Antonio, TX 
+                    0.7910                     0.6869                     0.6442 </code></pre>
 <p><strong>§ 3.5</strong> Determine the number of metropolitan areas in the United States from which at least 20% of interviewees are Asian.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:4</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 Asian的interviewee的平均(mean)</span>
+<span class="co">#step 2: 透過table次數分配表找出大於0.2的metropolitan areas共有四個</span>
+<span class="kw">table</span>(<span class="kw">tapply</span>(CPS_area<span class="op">$</span>Race <span class="op">==</span><span class="st"> &quot;Asian&quot;</span>,CPS_area<span class="op">$</span>MetroArea,mean)<span class="op">&gt;</span><span class="fl">0.2</span>)</code></pre></div>
+<pre><code>
+FALSE  TRUE 
+  260     4 </code></pre>
 <p><strong>§ 3.6</strong> Passing na.rm=TRUE to the tapply function, determine which metropolitan area has the smallest proportion of interviewees who have received no high school diploma.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: Iowa City, IA</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 Education中 No high school diploma的比率,並且移除NA值</span>
+<span class="co">#step 2: 再透過sort排序找出最小比率的metropolitan area為Iowa City, IA</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS_area<span class="op">$</span>Education <span class="op">==</span><span class="st"> &quot;No high school diploma&quot;</span>, CPS_area<span class="op">$</span>MetroArea, mean,<span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st"> </span>head</code></pre></div>
+<pre><code>           Iowa City, IA        Bowling Green, KY    Kalamazoo-Portage, MI 
+                 0.02913                  0.03704                  0.05051 
+    Champaign-Urbana, IL Bremerton-Silverdale, WA             Lawrence, KS 
+                 0.05155                  0.05405                  0.05952 </code></pre>
 <p><br><br></p>
 <hr />
 </div>
 <div id="section-4-integrating-country-of-birth-data" class="section level3">
 <h3>Section-4 Integrating Country of Birth Data</h3>
 <p><strong>§ 4.1</strong> What is the name of the variable added to the CPS data frame by this merge operation?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:Country</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1:透過merge將CPSData與CountryMap合併,再透過CountryOfBirthCode與Code欄位比對,並且保留全部x(CountryOfBirthCode)</span>
+<span class="co">#step 2:透過str比對出CPSData有14個variables及CPS_country有15個variables得知增加一個variable,經對照後看出為Country</span>
+CPS_country =<span class="st"> </span><span class="kw">merge</span>(CPSData, CountryMap, <span class="dt">by.x=</span><span class="st">&quot;CountryOfBirthCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
+<span class="kw">str</span>(CPSData)</code></pre></div>
+<pre><code>'data.frame':   131302 obs. of  14 variables:
+ $ PeopleInHousehold : int  1 3 3 3 3 3 3 2 2 2 ...
+ $ Region            : Factor w/ 4 levels &quot;Midwest&quot;,&quot;Northeast&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ State             : Factor w/ 51 levels &quot;Alabama&quot;,&quot;Alaska&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ MetroAreaCode     : int  26620 13820 13820 13820 26620 26620 26620 33660 33660 26620 ...
+ $ Age               : int  85 21 37 18 52 24 26 71 43 52 ...
+ $ Married           : Factor w/ 5 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 5 3 3 3 5 3 3 1 1 3 ...
+ $ Sex               : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 2 1 2 1 2 2 1 2 2 ...
+ $ Education         : Factor w/ 8 levels &quot;Associate degree&quot;,..: 1 4 4 6 1 2 4 4 4 2 ...
+ $ Race              : Factor w/ 6 levels &quot;American Indian&quot;,..: 6 3 3 3 6 6 6 6 6 6 ...
+ $ Hispanic          : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ CountryOfBirthCode: int  57 57 57 57 57 57 57 57 57 57 ...
+ $ Citizenship       : Factor w/ 3 levels &quot;Citizen, Native&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: 4 5 1 3 2 2 2 2 3 2 ...
+ $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA 11 NA NA 11 4 14 4 NA 12 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(CPS_country)</code></pre></div>
+<pre><code>'data.frame':   131302 obs. of  15 variables:
+ $ CountryOfBirthCode: int  57 57 57 57 57 57 57 57 57 57 ...
+ $ PeopleInHousehold : int  3 4 1 2 2 1 4 4 3 3 ...
+ $ Region            : Factor w/ 4 levels &quot;Midwest&quot;,&quot;Northeast&quot;,..: 3 3 3 3 3 3 3 3 3 3 ...
+ $ State             : Factor w/ 51 levels &quot;Alabama&quot;,&quot;Alaska&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ MetroAreaCode     : int  13820 26620 33860 26620 26620 33660 26620 26620 33860 33660 ...
+ $ Age               : int  60 2 54 46 52 40 24 4 2 30 ...
+ $ Married           : Factor w/ 5 levels &quot;Divorced&quot;,&quot;Married&quot;,..: 5 NA 4 2 2 3 1 NA NA 2 ...
+ $ Sex               : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 1 1 1 2 2 2 2 1 2 ...
+ $ Education         : Factor w/ 8 levels &quot;Associate degree&quot;,..: 1 NA 6 1 8 2 6 NA NA 2 ...
+ $ Race              : Factor w/ 6 levels &quot;American Indian&quot;,..: 3 6 6 6 6 6 6 6 6 6 ...
+ $ Hispanic          : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ Citizenship       : Factor w/ 3 levels &quot;Citizen, Native&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ EmploymentStatus  : Factor w/ 5 levels &quot;Disabled&quot;,&quot;Employed&quot;,..: 3 NA 1 2 2 2 2 NA NA 2 ...
+ $ Industry          : Factor w/ 14 levels &quot;Agriculture, forestry, fishing, and hunting&quot;,..: NA NA NA 8 10 11 11 NA NA 13 ...
+ $ Country           : Factor w/ 149 levels &quot;Afghanistan&quot;,..: 139 139 139 139 139 139 139 139 139 139 ...</code></pre>
 <p>How many interviewees have a missing value for the new metropolitan area variable?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:176</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過is.na得知Country的值是否為na</span>
+<span class="co">#再透過table得知是na值的總數</span>
+<span class="kw">table</span>(<span class="kw">is.na</span>(CPS_country<span class="op">$</span>Country))</code></pre></div>
+<pre><code>
+ FALSE   TRUE 
+131126    176 </code></pre>
 <p><strong>§ 4.2</strong> Among all interviewees born outside of North America, which country was the most common place of birth?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:Philippines</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#透過table得知country的次數分配 再透過sort看出其最常見的出生地為Philippines</span>
+<span class="kw">sort</span>(<span class="kw">table</span>(CPS_country<span class="op">$</span>Country),<span class="dt">decreasing =</span> <span class="ot">TRUE</span>)<span class="op">%&gt;%</span>head</code></pre></div>
+<pre><code>
+United States        Mexico   Philippines         India         China   Puerto Rico 
+       115063          3921           839           770           581           518 </code></pre>
 <p><strong>§ 4.3</strong> What proportion of the interviewees from the “New York-Northern New Jersey-Long Island, NY-NJ-PA” metropolitan area have a country of birth that is not the United States?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:0.309</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1:將所有的資料合併透過CPS_cuntry 加上MetroAreaMap</span>
+<span class="co">#step 2:再透過table計算Country不為United States以及MetroArea為New York-Northern New Jersey-Long Island, NY-NJ-PA</span>
+<span class="co">#step 3:透過table看出共有1668人為題目所需再除以1668+3736</span>
+CPS_all =<span class="st"> </span><span class="kw">merge</span>(CPS_country, MetroAreaMap, <span class="dt">by.x=</span><span class="st">&quot;MetroAreaCode&quot;</span>, <span class="dt">by.y=</span><span class="st">&quot;Code&quot;</span>, <span class="dt">all.x=</span><span class="ot">TRUE</span>)
+<span class="kw">table</span>(CPS_all<span class="op">$</span>Country<span class="op">!=</span><span class="st">'United States'</span>,CPS_all<span class="op">$</span>MetroArea<span class="op">==</span><span class="st">'New York-Northern New Jersey-Long Island, NY-NJ-PA'</span>)</code></pre></div>
+<pre><code>       
+        FALSE  TRUE
+  FALSE 78757  3736
+  TRUE  12744  1668</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1668</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">3736</span><span class="op">+</span><span class="dv">1668</span>)</code></pre></div>
+<pre><code>[1] 0.3087</code></pre>
 <p><strong>§ 4.4</strong> Which metropolitan area has the largest number (note – not proportion) of interviewees with a country of birth in India?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans:New York-Northern New Jersey-Long Island, NY-NJ-PA</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值</span>
+<span class="co">#step 2: 再透過sort排序找出最大的metropolitan area為New York-Northern New Jersey-Long Island, NY-NJ-PA</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS_all<span class="op">$</span>Country <span class="op">==</span><span class="st"> &quot;India&quot;</span>, CPS_all<span class="op">$</span>MetroArea, sum, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span>tail</code></pre></div>
+<pre><code>                 San Francisco-Oakland-Fremont, CA 
+                                                27 
+                        Detroit-Warren-Livonia, MI 
+                                                30 
+               Chicago-Naperville-Joliet, IN-IN-WI 
+                                                31 
+          Philadelphia-Camden-Wilmington, PA-NJ-DE 
+                                                32 
+      Washington-Arlington-Alexandria, DC-VA-MD-WV 
+                                                50 
+New York-Northern New Jersey-Long Island, NY-NJ-PA 
+                                                96 </code></pre>
 <p>In Brazil?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: Boston-Cambridge-Quincy, MA-NH</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值</span>
+<span class="co">#step 2: 再透過sort排序找出最大的metropolitan area為Boston-Cambridge-Quincy, MA-NH</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS_all<span class="op">$</span>Country <span class="op">==</span><span class="st"> &quot;Brazil&quot;</span>, CPS_all<span class="op">$</span>MetroArea, sum, <span class="dt">na.rm=</span><span class="ot">TRUE</span>)) <span class="op">%&gt;%</span>tail</code></pre></div>
+<pre><code>                   Bridgeport-Stamford-Norwalk, CT 
+                                                 7 
+New York-Northern New Jersey-Long Island, NY-NJ-PA 
+                                                 7 
+      Washington-Arlington-Alexandria, DC-VA-MD-WV 
+                                                 8 
+              Los Angeles-Long Beach-Santa Ana, CA 
+                                                 9 
+             Miami-Fort Lauderdale-Miami Beach, FL 
+                                                16 
+                    Boston-Cambridge-Quincy, MA-NH 
+                                                18 </code></pre>
 <p>In Somalia?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#</span>
-<span class="co">#</span></code></pre></div>
+<p>Ans: Minneapolis-St Paul-Bloomington, MN-WI</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#step 1: 再透過tapply看出各個MetroArea的 India的總和,並且移除NA值</span>
+<span class="co">#step 2: 再透過sort排序找出最大的metropolitan area為Minneapolis-St Paul-Bloomington, MN-WI</span>
+<span class="kw">sort</span>(<span class="kw">tapply</span>(CPS_all<span class="op">$</span>Country <span class="op">==</span><span class="st"> &quot;Somalia&quot;</span>, CPS_all<span class="op">$</span>MetroArea, sum, <span class="dt">na.rm=</span><span class="ot">TRUE</span>))<span class="op">%&gt;%</span>tail</code></pre></div>
+<pre><code>                          Columbus, OH                           Fargo, ND-MN 
+                                     5                                      5 
+           Phoenix-Mesa-Scottsdale, AZ            Seattle-Tacoma-Bellevue, WA 
+                                     7                                      7 
+                         St. Cloud, MN Minneapolis-St Paul-Bloomington, MN-WI 
+                                     7                                     17 </code></pre>
 <p><br><br><br></p>
 </div>
 
