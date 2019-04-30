@@ -1,0 +1,566 @@
+---
+title: "group 14_midterm"
+output: html_document
+---
+
+```{r results='hide', message=FALSE, warning=FALSE, echo=F}
+# 這些程式碼設定網頁的格式，並安裝、載入一些基本的套件，請大家不要去改動<br>
+rm(list=ls(all=T))
+
+knitr::opts_chunk$set(comment = NA)
+knitr::opts_knit$set(global.par = TRUE)
+par(cex=0.8)
+# options(scipen=20, digits=5, width=80)
+if(!require(pacman)) install.packages("pacman")
+```
+
+```{r results='hide', message=FALSE, warning=FALSE, include=FALSE}
+pacman::p_load(readr,dplyr,ggplot2,tidyr,d3heatmap,googleVis,forcats,leaflet,plotly,DT,purrr,tm,stringr,slam,knitr,lubridate,tidytext,data.table,wordcloud2,Rtsne,randomcoloR,shiny, MASS, dendextend, vegan, randomcoloR)
+```
+
+
+```{r, include=FALSE}
+geolocation<-read.csv("data/olist_geolocation_dataset.csv")
+customer <- read_csv("data/olist_customers_dataset.csv")
+item <- read_csv("data/olist_order_items_dataset.csv")
+review <- read_csv("data/olist_order_reviews_dataset.csv")         
+order <- read_csv("data/olist_orders_dataset.csv")
+product <-read_csv("data/olist_products_dataset.csv")
+seller <-read_csv("data/olist_sellers_dataset.csv")
+translation <-read_csv("data/product_category_name_translation.csv")
+lead <-read_csv("data/olist_closed_deals_dataset.csv")
+review$review_score = as.factor(review$review_score)
+review_tran <- read_csv("data/olist_order_reviews_dataset_translated.csv")
+```
+
+
+```{r,include=FALSE}
+ORIS = order %>%
+  inner_join(review) %>%
+  inner_join(item) %>%
+  inner_join(seller) %>%
+  inner_join(product) %>%
+  inner_join(translation)
+```
+
+
+###review簡單分析
+
+>review評分分佈
+
+```{r}
+mean(as.numeric(review$review_score))
+
+review=review[!duplicated(review$review_id),] 
+ggplot(review,aes(x=review_score))+
+  geom_bar(fill="steelblue")+
+geom_text(stat='count', aes(label=..count..), vjust=-0.2)+
+  ggtitle("買家對於訂單的星等分佈")+
+  theme(plot.title=element_text(family = "STHeiti"))
+```
+
+>用review出現頻率最高的字 draw a texplot wordcloud
+
+```{r , message=FALSE}
+review_tran_m = review_tran %>%
+  dplyr::select(translate_message)
+
+colnames(review_tran_m) = "text"
+
+data(stop_words) #add stop word
+
+stop_words_not = stop_words %>%
+  filter(word !="not")
+
+review_tran_conut =review_tran_m%>%
+  filter(!is.na(text))%>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words_not) %>%
+  count(word,sort=T)
+  
+review_tran_conut$word = removeNumbers(review_tran_conut$word)
+review_tran_conut = review_tran_conut %>% 
+  filter(!word =="")
+
+
+review_tran_conut %>%
+  top_n(10) %>%  # find top 10
+  mutate(word = reorder(word, n)) %>%  
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+
+review_tran_conut %>%
+  filter(word!="product")%>%
+  filter(word!="1")%>%
+  filter(word!="2")%>%
+  filter(word!="39")%>%
+  filter(n >200) %>%
+  wordcloud2()
+
+```
+
+>針對一顆星的評論做文字圖
+
+```{r, message=FALSE}
+
+review_tran_m = review_tran %>%
+  filter(review_score==1)%>%
+  dplyr::select(translate_message)
+
+colnames(review_tran_m) = "text"
+
+data(stop_words) #add stop word
+
+stop_words_not = stop_words %>%
+  filter(word !="not")
+
+review_tran_conut =review_tran_m%>%
+  filter(!is.na(text))%>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words_not) %>%
+  count(word,sort=T)
+  
+review_tran_conut$word = removeNumbers(review_tran_conut$word)
+review_tran_conut = review_tran_conut %>% 
+  filter(!word =="")
+
+
+review_tran_conut %>%
+  top_n(10) %>%  # find top 10
+  mutate(word = reorder(word, n)) %>%  
+  ggplot(aes(word, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+
+review_tran_conut %>%
+  filter(word!="product")%>%
+  filter(word!="1")%>%
+  filter(word!="2")%>%
+  filter(word!="39")%>%
+  filter(n >200) %>%
+  wordcloud2()
+```
+
+>一星層級式文字圖
+
+```{r,warning=FALSE, message=FALSE}
+reivew_1_score = review_tran %>%
+  filter(review_score==1)
+dtm =reivew_1_score$translate_message %>% 
+  iconv(to = "utf-8", sub="") %>% 
+  str_trim(.) %>%
+  toupper() %>%
+  VectorSource %>% Corpus %>% 
+  tm_map(content_transformer(tolower)) %>% 
+  tm_map(removePunctuation) %>% 
+#  tm_map(stemDocument) %>% 
+  DocumentTermMatrix %>% 
+  removeSparseTerms(0.998)
+#dtm  # (documents: 14156, terms: 1030)
+dtm_tmp=dtm
+```
+```{r,message=FALSE}
+tfidf = tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) *
+  log2(nrow(dtm)/col_sums(dtm > 0))
+#summary(tfidf)
+
+dtm=dtm_tmp
+dtm = dtm[, tfidf > 0.24 ]
+dtm = dtm[,order(-col_sums(dtm))]
+dim(dtm)
+```
+```{r}
+n = 200
+tsne = dtm[, 1:n] %>% as.data.frame.matrix %>% 
+  scale %>% t %>% Rtsne(
+    check_duplicates = FALSE, theta=0.0, max_iter=3200)
+```
+
+```{r}
+Y = tsne$Y              # tSNE coordinates
+d = dist(Y)             # distance matrix
+hc = hclust(d)          # hi-clustering
+K = 20              # number of clusters 
+g = cutree(hc,K)        # cut into K clusters
+#table(g) %>% as.vector %>% sort         # sizes of clusters
+
+```
+
+```{r, message=FALSE}
+library(wordcloud)
+wc = col_sums(dtm[,1:n])
+colors = distinctColorPalette(K)
+png("./olist_1_score.png", width=3200, height=1800)
+textplot(
+  Y[,1], Y[,2], colnames(dtm)[1:n], show=F,
+  col=colors[g],
+  cex= 3 + 0.3 * sqrt(wc/mean(wc)),
+  font=2)
+dev.off()
+```
+
+###對延遲訂單的簡單分析 
+
+- 比較估計的交付天數和交付的實際天數
+```{r}
+ORIS$delaydays=
+  difftime(as.Date(ORIS$order_delivered_customer_date,na.rm=TRUE),
+           as.Date(ORIS$order_estimated_delivery_date,na.rm=TRUE),units = "days")
+
+ORIS = ORIS %>%
+  filter(!is.na(delaydays))
+
+```
+
+>延遲訂單的比率與評分的關係
+
+```{r}
+ORIS$delay=ORIS$delaydays>0   #delay or not   
+ORIS$order_purchase_timestamp=as.Date(ORIS$order_purchase_timestamp,na.rm=TRUE)
+
+ ORIS %>%
+  group_by(review_score)%>%
+  summarise(delay_ratio =sum(delay)/n())%>%
+  ggplot(aes(review_score,delay_ratio))+
+  geom_bar(stat = "identity",fill="#65def7")+
+  ggtitle("延遲訂單的比率與評分的關係")+
+  theme(plot.title=element_text(family = "STHeiti"))
+```
+
+>delay天數跟review_score之間的關係
+
+```{r}
+ORIS$delaydays = as.numeric(ORIS$delaydays)
+
+ORIS_delay=ORIS %>%
+  filter(delaydays<50) %>%
+  filter(delaydays>0)%>%
+   # mutate( binwidth = delaydays %/% 5 )
+mutate( binwidth = paste(as.character((delaydays %/% 5)*5) ,"-", as.character((delaydays %/% 5)*5+4)))
+#w = paste(as.character((ORIS$B %/% 5)*5-4) ,zzz, as.character((ORIS$B %/% 5)*5))
+#w
+
+#  percentage of score ~ day
+ORIS_delay%>%
+ggplot(aes(binwidth, fill=review_score)) +
+  geom_bar(position = 'fill') +
+  geom_text(data = . %>% 
+              group_by(binwidth, review_score) %>%
+              tally() %>%
+              mutate(p = n / sum(n)) %>%
+              ungroup(),
+            aes(y = p, label = scales::percent(p)),
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE)+
+  labs(x = "delay days",y = "percentage")+
+  ggtitle("延遲送達天數與評分的關係")+
+  theme(plot.title=element_text(family = "STHeiti"))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))
+
+
+
+
+
+ORIS_nodelay=ORIS %>%
+  filter(delaydays <0)%>%
+  mutate( binwidth = paste(as.character((delaydays %/% 10)*10-9) ,"-", as.character((delaydays %/% 10)*10)))
+
+
+ORIS_nodelay%>%
+  ggplot(aes(binwidth, fill=review_score)) +
+  geom_bar(position = 'fill') +
+  geom_text(size = 3,data = . %>% 
+              group_by(binwidth, review_score) %>%
+              tally() %>%
+              mutate(p = n / sum(n)) %>%
+              ungroup(),
+            aes(y = p, label = scales::percent(p)),
+            position = position_stack(vjust = 0.5),
+            show.legend = FALSE)+
+  labs(x = "Early delivery days",y = "percentage")+
+  ggtitle("提前送達天數與評分的關係")+
+  theme(plot.title=element_text(family = "STHeiti"))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))
+
+
+```
+
+>延遲訂單熱圖
+
+```{r}
+delay_data  = ORIS %>%
+  dplyr::select(order_purchase_timestamp) 
+delay_data$month=format(delay_data$order_purchase_timestamp,'%Y%m') 
+delay_data$day=format(delay_data$order_purchase_timestamp,'%d') 
+
+table(as.numeric(delay_data$month),as.numeric(delay_data$day)) %>%as.data.frame.matrix %>% 
+  {log(.+1)} %>%  
+  d3heatmap(F,F,color=cm.colors(17))
+```
+
+
+>延遲訂單月份分佈
+
+```{r,message=FALSE}
+
+
+ggplot(ORIS, aes(as.factor(month(ORIS$order_purchase_timestamp)), fill =delay )) + geom_bar()+
+  labs(x = "month")+
+  ggtitle('每月延遲訂單時間分佈')+
+  theme(plot.title=element_text(family = "STHeiti"))
+```
+
+```{r}
+ORIS%>%
+  mutate(year = year(order_purchase_timestamp),month = month(order_purchase_timestamp))%>%
+  group_by(month,year)%>%
+  summarise(delay_percent = sum(delay==T)/n()) %>%
+  mutate(year_month = paste(as.character(year), as.character(month)))%>%
+  filter(year_month !="2016 9")%>%
+  ggplot(aes(x=year_month,y=delay_percent))+
+  geom_bar(stat="identity",fill="salmon2")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))+
+  ggtitle('每月延遲訂單比例')+
+  theme(plot.title=element_text(family = "STHeiti"))
+
+```
+`2,3,11月延遲訂單數最多`
+
+>201711、201802、201803延遲狀況
+
+```{r}
+
+#201711
+ratio_delay_201711  =ORIS %>%
+  filter(as.factor(month(order_purchase_timestamp))==11&as.factor(year(order_purchase_timestamp))==2017) %>%
+    group_by(order_purchase_timestamp)%>%
+  summarise(delay_percent = sum(delay==T)/n())
+ratio_delay_201711%>%
+  ggplot(aes(x=order_purchase_timestamp,y=delay_percent))+
+  geom_bar(stat="identity",fill="salmon3")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))+
+  ggtitle('11月延遲訂單比例')+
+  theme(plot.title=element_text(family = "STHeiti"))
+
+#201802
+ratio_delay_201803  =ORIS %>%
+  filter(as.factor(month(order_purchase_timestamp))==3&as.factor(year(order_purchase_timestamp))==2018) %>%
+    group_by(order_purchase_timestamp)%>%
+  summarise(delay_percent = sum(delay==T)/n())
+ratio_delay_201803%>%
+  ggplot(aes(x=order_purchase_timestamp,y=delay_percent))+
+  geom_bar(stat="identity",fill="salmon3")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))+
+  ggtitle('3月延遲訂單比例')+
+  theme(plot.title=element_text(family = "STHeiti"))
+
+#201803延遲狀況
+ratio_delay_201802  =ORIS %>%
+  filter(as.factor(month(order_purchase_timestamp))==2&as.factor(year(order_purchase_timestamp))==2018) %>%
+    group_by(order_purchase_timestamp)%>%
+  summarise(delay_percent = sum(delay==T)/n())
+ratio_delay_201802%>%
+  ggplot(aes(x=order_purchase_timestamp,y=delay_percent))+
+  geom_bar(stat="identity",fill="salmon3")+
+  theme(axis.text.x = element_text(angle = 45, hjust = 0.5, vjust = 0.5))+
+  ggtitle('2月延遲訂單比例')+
+  theme(plot.title=element_text(family = "STHeiti"))
+
+```
+
+>延遲訂單地圖
+
+```{r}
+RI= merge(review,item,by="order_id")%>%
+  dplyr::select(order_id,review_id,review_score,seller_id)
+SRI= RI %>%
+  na.omit()%>% 
+  group_by(seller_id) %>% 
+  summarize(reviews_times= n_distinct(review_id),average_score =mean(as.numeric(review_score))) %>%
+   merge(seller,by= "seller_id") %>% 
+  rename(zip_code_prefix=seller_zip_code_prefix)
+```
+```{r}
+colnames(geolocation)[1] = "zip_code_prefix"
+geolocation$zip_code_prefix =as.character(geolocation$zip_code_prefix)
+GSRI3 = geolocation %>%
+  group_by(zip_code_prefix) %>%
+  summarise(lat =mean(geolocation_lat),lng=mean(geolocation_lng)) %>%
+  inner_join(SRI,by = "zip_code_prefix")
+```
+
+```{r}
+order$late_time=difftime(as.Date(order$order_delivered_customer_date,na.rm=TRUE),as.Date(order$order_estimated_delivery_date,na.rm=TRUE),units = "days")
+
+late_order = filter(order, late_time >0) #篩選出延遲訂單
+
+#合併客戶與延遲訂單
+late_customer = merge(late_order,customer,by="customer_id")
+
+colnames(late_customer)[11]="zip_code_prefix"
+colnames(geolocation)[1]="zip_code_prefix"
+```
+
+```{r}
+#seller geolocation
+geolocation %>%
+  group_by(zip_code_prefix) %>%
+  summarise(lat =mean(geolocation_lat),lng=mean(geolocation_lng)) %>%
+  inner_join(late_customer,by = "zip_code_prefix")
+#合併客戶延遲訂單與地理位置
+
+geo_late_customer =geolocation %>%
+  group_by(zip_code_prefix) %>%
+  summarise(lat =mean(geolocation_lat),lng=mean(geolocation_lng)) %>%
+  inner_join(late_customer,by = "zip_code_prefix")
+```
+
+
+```{r}
+geo_late_customer = geo_late_customer %>%
+  dplyr::select(zip_code_prefix,lat,lng,customer_id,order_id,
+         order_estimated_delivery_date,late_time,
+         customer_city,customer_state)
+
+geo_late_customer$group <- paste(
+   
+    sprintf("LateDays:%.1f", geo_late_customer$late_time),
+   
+    sep = "<br/>"
+)
+
+geo_late_customer$late_time = as.numeric(geo_late_customer$late_time)
+geo_late_customer$late.time<- cut(geo_late_customer$late_time ,c(0,25,50,75,100,125,150,175,200))
+
+bm <- split(geo_late_customer ,geo_late_customer$late.time)
+```
+
+
+```{r}
+l <- leaflet() %>% addTiles()
+
+names(bm) %>% 
+    walk(function(df){
+        l <<- l %>% 
+            addMarkers(data=bm[[df]], 
+                lng=~lng, 
+                lat=~lat,
+                
+                popup=~group,
+                group = df,
+                clusterOptions=markerClusterOptions(removeOutsideVisibleBounds=F),
+                labelOptions = labelOptions(noHide=F, direction='auto'))
+        })
+l %>% addLayersControl(
+  overlayGroups = names(bm),
+  options = layersControlOptions(collapsed = FALSE) )
+```
+
+> delay商品排行
+
+```{r,message=FALSE}
+ORIS%>%
+  filter(!is.na(delay)) %>%
+  group_by(product_category_name_english)%>% 
+  summarise(
+    ratio=sum(delay)/n()
+  ) %>%  
+  top_n(10) %>%
+  mutate(new_x=reorder(product_category_name_english,ratio)) %>% 
+ggplot(aes(new_x,ratio)) +
+  geom_bar(stat='identity',fill = "steelblue")+
+  ggtitle("商品種類與延遲訂單的比率")+
+  theme(plot.title=element_text(family = "STHeiti"))+ 
+  coord_flip()
+
+```
+
+
+
+###產業壟斷
+
+>商品種類的評分
+
+```{r}
+ORIS %>%
+  unique()%>%
+  group_by(product_category_name_english)%>%
+  summarise(avg_score=mean(as.numeric(review_score))) %>% 
+  arrange(desc(avg_score))%>%
+  # mutate(score_m_4 = ifelse(avg_score>=4,T,F))%>%
+  ggplot(aes(reorder(product_category_name_english,-avg_score),avg_score))+
+  geom_bar(fill="plum4",stat = "identity")+
+  theme(axis.text=element_text(size=8)) +
+  geom_vline(xintercept=45,  col = "yellow",lty=10)+
+  xlab('') + ylab('score') + 
+  ggtitle('商品種類的評分')+
+  theme(plot.title=element_text(family = "STHeiti"))+
+  coord_flip() 
+
+```
+
+
+
+>計算產業集中度
+
+```{r}
+category = filter(ORIS, !is.na(product_category_name_english)) %>% 
+  group_by(product_category_name_english) %>% summarise(
+    itemsSold = n(),
+    totalRev = sum(price),
+    avgPrice = mean(price),
+    noProduct = n_distinct(product_id),
+    noSeller = n_distinct(seller_id),
+    dummy = 2018
+  ) %>% arrange(desc(totalRev))
+```
+
+```{r}
+X = filter(ORIS, !is.na(product_category_name_english)) %>% 
+  group_by(product_category_name_english, seller_id) %>%     # cascading groups
+  summarise(revenue = sum(price)) %>%   # drop last grouping
+  arrange(product_category_name_english, desc(revenue)) %>%  # arrange and ...
+  mutate(                               # mutate within cetegory
+    rn = row_number(desc(revenue)),  # rank by revenue
+    share = revenue/sum(revenue),    # market share 
+    c.share = cumsum(share)          # cumm. market share
+  )
+```
+
+```{r}
+category = X %>% group_by(product_category_name_english) %>% 
+  summarise(
+    concentrate = sum(share^2),
+    top3.con = max(c.share[rn <= 3]),
+    top5.con = max(c.share[rn <= 5]),
+    top10.con = max(c.share[rn <= 10])
+  ) %>% 
+  right_join(category) %>% 
+  arrange(desc(concentrate))
+```
+
+>產業集中率與評分關係
+
+```{r,message=FALSE}
+ORIS %>%
+  group_by(product_category_name_english)%>%
+  summarise(avg_review = mean(as.numeric(review_score)))%>%
+  # arrange(desc(avg_review)) %>%
+  inner_join(category)%>%
+  filter(totalRev > 100000)%>%
+  arrange(desc(top3.con))%>%
+  ggplot(aes(avg_review,concentrate,col=totalRev))+
+  geom_point(aes(size = noSeller))+
+  geom_text(aes(label =product_category_name_english),size =3,nudge_x = 0.05,nudge_y = 0.02)+
+  ggtitle("產業集中率與評分的關係")+
+  labs(y = "HHI")+
+  theme(plot.title=element_text(family = "STHeiti"))
+```
+
+
+
+
+
