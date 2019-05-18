@@ -80,9 +80,11 @@ We can plot the line of `logit = 0` or `odd = 1, prob = 0.5` on the plane of $X$
 par(cex=0.8, mar=c(4,4,1,1))
 plot(D$x1, D$x2, col=2+D$y, pch=20, cex=1.2, xlab="X1", ylab="X2")
 abline(-b[1]/b[3], -b[2]/b[3], col="blue", lty=3)
+```
 
-##紅點y=0、綠點y=1
-##藍線代表logit=0，y=1的機率為0.5，線上方代表模型預測y=1的機率越大
+```
+紅點y=0、綠點y=1
+藍線代表logit=0，y=1的機率為0.5，線上方代表模型預測y=1的機率越大
 ```
 
 Furthermore, we can translate probability, logit and coefficents to intercept & slope ...
@@ -106,15 +108,15 @@ for(f in logit) {
 
 <span style="font-size:24px"> `r "\U1F5FF"` : </span>
 What do the blue/cyan lines means?<br>
-```{R}
-#，而越上面的線機率會越低；越下面的線機率會越高
-#九條線代表模型預測那條線上y=1的機率,分別為p=0.1~0.9,深藍色代表p=0.5
+```
+九條線代表模型預測那條線上y=1的機率,分別為p=0.1~0.9,深藍色代表p=0.5
+越上面的線機率會越低；越下面的線機率會越高
 ```
 
 <span style="font-size:24px"> `r "\U1F5FF"` : </span>
 Given any point in the figure above, how can you tell its (predicted) probability approximately?<br>
-```{R}
-#只要知道x1.x2的值，即可利用邏輯式函數求得任意點y=1的機率
+```
+只要知道x1.x2的值，即可利用邏輯式函數求得任意點y=1的機率
 ```
 
 <br><hr>
@@ -161,9 +163,9 @@ points(0,0.5,pch=20,cex=1.5,col='red')
 
 <span style="font-size:24px"> `r "\U1F5FF"` : </span>
 What are the definiion of `logit` & `logistic function`? What is the relationship between them?<br>
-```{R}
-#logit: 利用X做成的一個線性組合
-#logistic function: 將線性組合的值(logit)代入連結函數( 1/(1+exp(-g(x))) ) 以預測出y=1的機率
+```
+logit: 利用X做成的一個線性組合
+logistic function: 將線性組合的值(logit)代入連結函數( 1/(1+exp(-g(x))) ) 以預測出y=1的機率
 ```
 ```{r pressure, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("f.jpg")
